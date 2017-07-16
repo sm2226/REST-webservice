@@ -1,0 +1,26 @@
+package DbConnect;
+
+import java.sql.Connection;  
+
+import java.sql.DriverManager;
+
+
+public class ConnToMysql {
+	static public Connection getConn(){
+		Connection con=null;
+		try{
+			/* Before accessing the data from Database, we need to establish a connection 
+			 * between Database and Java Application. "com.mysql.jdbc.Driver" is where driver class for mysql is present.
+			 * Using Connection class we create a connection by invoking getConnection method
+			 * 3306 is the default port where mysql is installed when u install on pc
+			 */
+			Class.forName("com.mysql.jdbc.Driver");
+			con=DriverManager.getConnection("jdbc:mysql://localhost:3306/demoproject", "root", "root");
+		}
+		catch(Exception e){
+		//	System.out.println("Error:   "+e);
+		}
+		return con;
+	}
+}
+
