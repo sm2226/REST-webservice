@@ -1,0 +1,43 @@
+package DbConnect;
+
+public class FeedObject {
+	String partner_id;
+	String ad_content;
+	int duration;
+	String date;
+	
+	
+	public String getPartnerid() {
+		return partner_id;
+	}
+	public void setPartnerid(String partner_id) {
+		this.partner_id = partner_id;
+	}
+	public String getAdcontent() {
+		return ad_content;
+	}
+	public void setAdcontent(String ad_content) {
+		this.ad_content = ad_content;
+	}
+	public int getDuration() {
+		return duration;
+	}
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	
+	public FeedObject() {
+		System.out.println(partner_id+"^^^^^"+ad_content+"^^^^^^^"+duration+"^^^^^^^^"+date);
+		//super();
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+}
