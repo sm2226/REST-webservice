@@ -1,0 +1,122 @@
+
+package adcampaign;
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import DbConnect.FeedObject;
+
+
+//import java.sql.SQLIntegrityConstraintViolationException;
+@Path("/webApi")
+
+public class campaign{
+	
+	/* This method is used to select all the rows from the adcampaign table. 
+	 * I have given the path as selectall.
+	 * The data is projected in JSON format.
+	 */
+	@GET
+	@Path("/getData")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String getAll(){
+		Connection con=null;
+		JSONArray array=new JSONArray();				//New JSON array
+		JSONObject objFinal=new JSONObject();
+		try{		
+			con=DbConnect.ConnToMysql.getConn(); 		//Getting conn for the Mysql. I have defined the connectivity code in ConnToMysql class
+			PreparedStatement pst=con.prepareStatement("select * from adcampaign");
+			ResultSet rs=pst.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject(); 		//New JSON object
+				obj.put("PartnerId", rs.getString(1));  // Adding the resultset data to Json object
+				obj.put("Duration", rs.getInt(2));
+				obj.put("Ad Content", rs.getString(3));
+				obj.put("Date", rs.getString(4));
+				array.put(obj);							// Adding all the objects to a JSON array
+			}
+			objFinal.put("AdCampaignData", array); 
+		}
+		catch (Exception e) {
+		}
+		return objFinal+"";
+	}
+	
+	/* This method is used to select a particular row from the adcampaign table
+	 * with a specified partner_id. I have given the path as select/<ID>.
+	 * The data is projected in JSON format.
+	 */
+	@GET
+	@Path("/getDataById/{partner_id}")						// The partner_id here is the parameter that will be passed in the URL
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String getById(@PathParam(value = "partner_id") String partner_id){
+		System.out.println(partner_id +"^^^^^^^");
+		Connection con=null;
+		JSONArray array=new JSONArray();				//New JSON array
+		JSONObject objFinal=new JSONObject();
+		try{		
+			con=DbConnect.ConnToMysql.getConn();
+			PreparedStatement pst=con.prepareStatement("select * from adcampaign where partner_id="+partner_id);
+			ResultSet rs=pst.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();		//New JSON object
+				obj.put("Partner Id", rs.getString(1));	// Adding the resultset data to Json object
+				obj.put("Duration", rs.getInt(2));
+				obj.put("Ad Content", rs.getString(3));
+				obj.put("Date", rs.getString(4));
+				array.put(obj);							// Adding all the objects to a JSON array
+			}
+			objFinal.put("AdCampaignData", array);
+		}
+		catch(Exception ex){}
+		return objFinal+"";
+	}
+	
+	/* This method is used to post data to adcampaign table
+	 * I have given the path as insert.
+	 * The data is given in JSON format in postmaster.
+	 */
+	@POST
+	@Path("/postData")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String insertData(String s){
+		System.out.println("********"+s);
+		JsonParser parer=new JsonParser();				//A JSON parser object creation
+		JsonObject obj=(JsonObject) parer.parse(s);		//The input (row to be inserted) is parsed into JSON object
+		Gson gson=new Gson();
+		FeedObject feed=gson.fromJson(obj, FeedObject.class); 	//Setters and getters (FeedObject class) is accessed
+		try{
+			Connection con=DbConnect.ConnToMysql.getConn();
+			String partner_id= feed.getPartnerid();		//Data is assigned to new variables. The data is accessed using getters
+			String ad_content= feed.getAdcontent();
+			String date = feed.getDate();
+			int duration = feed.getDuration();
+			
+			//insert into adcampaign (partner_id, duration, ad_content, date) values('partner_id', duration, 'ad_content','date');
+			String insertQuery="insert into adcampaign (partner_id, duration, ad_content, date) 			values('"+partner_id+"',"+duration+",'"+ad_content+"','"+date+"')";
+			PreparedStatement pst=con.prepareStatement(insertQuery);
+			pst.executeUpdate();
+			pst.close();
+			con.close();
+		}
+		catch(SQLException e){
+		}
+		return "inserted";
+
+	}
+}
