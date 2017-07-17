@@ -115,8 +115,9 @@ public class campaign{
 			con.close();
 		}
 		catch(SQLException e){
+			return "A campaign already exist for a given partner_id";
 		}
-		return "inserted";
+		return "New record inserted";
 
 	}
 }
